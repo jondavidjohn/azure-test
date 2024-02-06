@@ -83,7 +83,3 @@ resource "azurerm_linux_virtual_machine" "example" {
     version   = "latest"
   }
 }
-
-output "machine_password" {
-  value = random_password.password.result
-}
