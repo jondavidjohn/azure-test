@@ -13,8 +13,17 @@ terraform {
   }
 }
 
+provider "random" {
+}
+
 provider "azurerm" {
   features {}
+}
+
+resource "random_password" "password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
 resource "azurerm_resource_group" "example" {
@@ -53,7 +62,11 @@ resource "azurerm_linux_virtual_machine" "example" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   size                = "Standard_F2"
+
+  disable_password_authentication = false
   admin_username      = "adminuser"
+  admin_password      = random_password.password.result
+
   network_interface_ids = [
     azurerm_network_interface.example.id,
   ]
@@ -69,4 +82,8 @@ resource "azurerm_linux_virtual_machine" "example" {
     sku       = "22_04-lts"
     version   = "latest"
   }
+}
+
+output "machine_password" {
+  value = random_password.password.result
 }
